@@ -51,7 +51,7 @@ footer{color:var(--mu);font-size:.8em;margin:16px 0}
 </head>
 <body class="aof">
 <h1>Décors &amp; plateau</h1>
-<p class="sub">Règles avancées v3.6.0 — Terrain avancé (placement, générateurs), p. 29 à 31</p>
+<p class="sub">Règles avancées v3.6.0 — Terrain avancé (placement, générateurs)</p>
 
 <div class="ctl">
  <label>Jeu<select id="jeu"><option value="aof">Age of Fantasy</option><option value="gf">Grimdark Future</option></select></label>
@@ -73,7 +73,7 @@ footer{color:var(--mu);font-size:.8em;margin:16px 0}
 <svg id="tb" role="img" aria-label="Plan du plateau"></svg>
 <div id="info"></div>
 <ol id="leg"></ol>
-<footer>Sources : GF / AoF Advanced Rulebook v3.6.0 (p. 11 recommandations, p. 29 placement, p. 30-31 générateurs). Les noms et icônes varient selon le jeu ; les effets de règle restent ceux des tableaux.<br>
+<footer>Source : GF / AoF Advanced Rulebook v3.6.0. Les noms et icônes varient selon le jeu ; les effets de règle restent ceux des tableaux.<br>
 Hypothèses : pièces placées de la plus grande à la plus petite ; emplacements tirés au hasard (les joueurs choisiraient) ; style 1 : la pièce part du centre d'une zone et avance jusqu'à 2D6" vers une autre en s'arrêtant avant de passer à 6" ou moins d'une pièce ; le contrôle d'équilibre est une heuristique de l'outil, pas une règle.</footer>
 
 <script>
@@ -187,6 +187,26 @@ const $=id=>document.getElementById(id);
 const V={aof:{barricade:["Palissade","🪵"],wall:["Muret / clôture","🧱"],blocker:["Falaise / muraille","🗻"],building:["Grande bâtisse / tour","🏰"],smallb:["Hameau","🛖"],
  mines:["Champ de pièges","✹"],smog:["Brume maudite","☁"],toxriver:["Rivière empoisonnée","☣"],sludgestream:["Ruisseau de boue","〰"]},
  gf:{barricade:["Barricade","🚧"],blocker:["Bloc industriel","🏭"],building:["Grand bâtiment","🏢"],smallb:["Bloc de petits bâtiments","🏘"],ruins:["Ruines / débris","🏗"]}};
+const esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function wrap(t,n){const o=[];let l="";for(const x of String(t).split(" ")){if(l&&(l+" "+x).length>n){o.push(l);l=x;}else l=l?l+" "+x:x;}if(l)o.push(l);return o;}
+function buildSVG(){
+ const r=window.cur,hd=window.curHead,P=r.P,W=r.W,H=r.H,PW=794,M=20,CW=(PW-2*M)/3;
+ const ff=((getComputedStyle(document.body).fontFamily)||"sans-serif").replace(/"/g,"'");
+ const sc=Math.min((PW-2*M)/(W+6),566/(H+6)),pw=(W+6)*sc,ph=(H+6)*sc,ox=(PW-pw)/2,o=[];let y=M;
+ o.push(`<text x="${M}" y="${y+16}" font-size="20" font-weight="700">${esc(hd.title)}</text>`);y+=26;
+ wrap(hd.sub,105).forEach(l=>{o.push(`<text x="${M}" y="${y+12}" font-size="12.5">${esc(l)}</text>`);y+=17;});y+=8;
+ const plan=$("tb").innerHTML.replace(/var\(--felt\)/g,"#e4e7de").replace(/stroke="#ffffff"/g,'stroke="#444"').replace(/stroke="#e6e2d8"/g,'stroke="#444"');
+ o.push(`<rect x="${ox}" y="${y}" width="${pw}" height="${ph}" fill="#fff" stroke="#999"/><g transform="translate(${ox} ${y}) scale(${sc}) translate(3 3)">${plan}</g>`);y+=ph+18;
+ for(const[c,t]of window.curLines){const col=c==="ok"?"#2e7d32":c==="ko"?"#b5482a":c==="tg"?"#555":"#111";
+  for(const l of wrap(t,120)){o.push(`<text x="${M}" y="${y+10}" font-size="11" fill="${col}">${esc(l)}</text>`);y+=14;}y+=3;}
+ y+=8;
+ for(let i0=0;i0<P.length;i0+=3){const row=P.slice(i0,i0+3).map((p,k)=>{const t=T[p.id],n=ni(p.id);
+   return{p,t,lines:[...wrap(`${i0+k+1}. ${n[1]} ${n[0]}`,30),`${sz(p.w,p.h)} — joueur ${p.by}`,...wrap([...tags(p)].map(c=>TG[c]).join(", ")+(p.dng?` (dangereux, choisi par ${p.dng})`:""),38)]};});
+  const hh=Math.max(...row.map(x=>x.lines.length))*13+10;
+  row.forEach((x,k)=>{const cx=M+k*CW;o.push(`<rect x="${cx}" y="${y}" width="${CW-8}" height="${hh-4}" fill="#fff" stroke="#999" rx="3"/><rect x="${cx+6}" y="${y+7}" width="10" height="10" rx="2" fill="${x.t[2]}"/>`);
+   x.lines.forEach((l,m)=>o.push(`<text x="${cx+22}" y="${y+16+m*13}" font-size="10.5"${m===0?' font-weight="700"':m>=2?' fill="#555"':""}>${esc(l)}</text>`));});y+=hh;}
+ const Ht=Math.ceil(y+M);
+ return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${PW} ${Ht}" width="${PW}" height="${Ht}" font-family="${ff}" fill="#111"><style>@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English&amp;family=Orbitron:wght@500;700&amp;display=swap');</style><rect width="${PW}" height="${Ht}" fill="#fff"/>${o.join("")}</svg>`;}
 const ni=id=>(V[document.body.className]||{})[id]||[T[id][0],T[id][1]];
 function spath(pts,cx,cy){const n=pts.length,P=i=>pts[(i%n+n)%n],f=(a,b)=>`${(cx+a).toFixed(2)} ${(cy+b).toFixed(2)}`;let d=`M${f(...P(0))}`;
  for(let i=0;i<n;i++){const a=P(i-1),b=P(i),c=P(i+1),e=P(i+2);d+=`C${f(b[0]+(c[0]-a[0])/6,b[1]+(c[1]-a[1])/6)} ${f(c[0]-(e[0]-b[0])/6,c[1]-(e[1]-b[1])/6)} ${f(...c)}`;}return d+"Z";}
@@ -210,10 +230,12 @@ function render(r,tries){
  const row=(a,t)=>`<p class="${a[1]?"ok":"ko"}">${a[1]?"✔":"✘"} ${a[0]} : ${a[2]}${t||""}</p>`;
  h+=r.audit.chk.map(a=>row(a)).join("")+r.audit.bal.map(a=>row(a)).join("");
  if(!r.audit.chk[3][1])h+=`<p class="tg">Surface : avec plus de 6" entre pièces, 25 % est quasi inatteignable sur 6'x4'. Mesuré sur le générateur générique : environ 11 % (4–8"), 16 % (5–10"), 19 % (6–12"), au prix de pièces retirées.</p>`;
- h+=`<p class="tg">Dimensions = rectangle englobant de la pièce (les formes naturelles sont inscrites dedans).</p><p class="tg">Recommandations p. 11 (pour un choix manuel) ; les générateurs ne les garantissent pas. Les deux lignes d'équilibre sont une heuristique de l'outil.</p>`;
+ h+=`<p class="tg">Dimensions = rectangle englobant de la pièce (les formes naturelles sont inscrites dedans).</p><p class="tg">Recommandations du livre de règles (pour un choix manuel) ; les générateurs ne les garantissent pas. Les deux lignes d'équilibre sont une heuristique de l'outil.</p>`;
  const o=window.curO||{},jeu={aof:"Age of Fantasy",gf:"Grimdark Future"}[document.body.className]||"";
- $("ph").innerHTML=`<h2>Décors &amp; plateau — ${jeu}</h2><div>Table ${sz(W,H)} · ${STY[r.style]} · générateur ${o.gen&&G[o.gen]?(o.gen==="libre"?"Libre":G[o.gen].nom):""} · grandes pièces ${(o.siz||[4,8]).join("–")}"</div>`;
+ const title=`Décors & plateau — ${jeu}`,sub=`Table ${sz(W,H)} · ${STY[r.style]} · générateur ${o.gen&&G[o.gen]?(o.gen==="libre"?"Libre":G[o.gen].nom):""} · grandes pièces ${(o.siz||[4,8]).join("–")}"`;
+ window.curHead={title,sub};$("ph").innerHTML=`<h2>${esc(title)}</h2><div>${esc(sub)}</div>`;
  $("info").innerHTML=h;
+ window.curLines=[...h.matchAll(/<p(?: class="([^"]*)")?>(.*?)<\/p>/g)].map(m=>[m[1]||"",m[2].replace(/<[^>]+>/g,"")]);
  $("leg").innerHTML=P.map((p,i)=>{const t=T[p.id],nI=ni(p.id);return`<li><span class="sw" style="background:${t[2]}"></span><span><b>${i+1}. ${nI[1]} ${nI[0]}</b> — ${sz(p.w,p.h)} — joueur ${p.by}<br><span class="tg">${[...tags(p)].map(k=>TG[k]).join(", ")}${p.dng?` (dangereux, choisi par ${p.dng})`:""}</span></span></li>`}).join("");}
 function go(){
  const o={tab:$("tab").value.split("x").map(Number),sty:+$("sty").value,gen:$("gen").value,siz:$("siz").value.split("-").map(Number),n:+$("n").value||15,org:$("org").checked};
@@ -222,9 +244,7 @@ function go(){
 $("go").onclick=go;
 $("pdf").onclick=()=>{const t=document.title;document.title="Plateau OPR - "+({aof:"AoF",gf:"GF"}[document.body.className]||"");window.onafterprint=()=>{document.title=t;};window.print();};
 $("jeu").onchange=()=>{document.body.className=$("jeu").value;if(window.cur)render(window.cur,1);};
-$("svg").onclick=()=>{const s=$("tb").cloneNode(true);s.setAttribute("xmlns","http://www.w3.org/2000/svg");s.style.background="#0e1113";
- const css=getComputedStyle(document.body).getPropertyValue("--felt");const x=new XMLSerializer().serializeToString(s).replace(/var\(--felt\)/g,css.trim());
- const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([x],{type:"image/svg+xml"}));a.download="plateau-opr.svg";a.click();};
+$("svg").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([buildSVG()],{type:"image/svg+xml"}));a.download="plateau-opr.svg";a.click();};
 go();
 </script>
 </body>
