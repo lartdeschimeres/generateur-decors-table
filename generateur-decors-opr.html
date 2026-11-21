@@ -16,7 +16,7 @@ h1{font:700 1.5em/1.2 var(--ff);margin:4px 0}
 .sub{color:var(--mu);margin:0 0 12px;font-size:.85em}
 .ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;background:var(--pn);padding:10px;border:1px solid var(--ln);border-radius:6px}
 label{display:flex;flex-direction:column;font-size:.8em;color:var(--mu);gap:3px}
-select,input[type=number]{background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:4px;padding:7px;font:inherit}
+select,input[type=number],input[type=text]{background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:4px;padding:7px;font:inherit}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;align-items:center}
 button{background:var(--ac);color:#111;border:0;border-radius:4px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
 button.s{background:var(--pn);color:var(--tx);border:1px solid var(--ln);font-weight:500}
@@ -33,11 +33,16 @@ li b{font-weight:600}
 .tg{color:var(--mu)}
 footer{color:var(--mu);font-size:.8em;margin:16px 0}
 #ph{display:none}
+details{margin:10px 0;background:var(--pn);border:1px solid var(--ln);border-radius:6px;padding:8px 10px}
+summary{cursor:pointer;font-weight:600}
+#clist{list-style:none;padding:0;margin:6px 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px}
+.x{margin-left:auto;background:none;border:0;color:var(--mu);cursor:pointer;padding:0 6px;font:inherit;font-weight:700}
+.hid{display:none}
 @page{size:A4 portrait;margin:10mm}
 @media print{
  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
  body.aof,body.gf{--felt:#e4e7de;--bg:#fff;--tx:#111;--mu:#444;--pn:#fff;--ln:#999;padding:0;background:#fff;max-width:none}
- .ctl,.row,footer{display:none!important}
+ .ctl,.row,footer,details{display:none!important}
  #ph{display:block;margin:0 0 4mm;font-size:.95em}
  #ph h2{font:700 1.4em/1.2 var(--ff);margin:0 0 1mm}
  svg{background:#fff!important;border:1px solid #999;max-height:150mm}
@@ -61,6 +66,22 @@ footer{color:var(--mu);font-size:.8em;margin:16px 0}
  <label>Taille des grandes pièces<select id="siz"><option value="4-8">Standard 4–8" (10–20 cm)</option><option value="5-10" selected>Grandes 5–10" (13–25 cm)</option><option value="6-12">Très grandes 6–12" (15–30 cm)</option></select></label>
  <label>N pièces (mode libre)<input id="n" type="number" min="8" max="30" value="15"></label>
 </div>
+<div class="ctl">
+ <label>Source des décors<select id="src"><option value="gen">Générateur (icônes abstraites)</option><option value="col">Ma collection</option></select></label>
+ <label class="chk"><input type="checkbox" id="fill" checked>&nbsp;Compléter avec des pièces génériques si un type manque</label>
+</div>
+<details id="colbox"><summary>Ma collection de décors (<span id="ccount">0</span> pièce(s))</summary>
+ <div class="ctl" style="margin-top:8px">
+  <label>Type<select id="ctype"></select></label>
+  <label>Nom (facultatif)<input id="cname" type="text" maxlength="40"></label>
+  <label>Longueur (cm)<input id="cw" type="number" min="1" max="60" step="0.5" value="20"></label>
+  <label>Largeur (cm)<input id="ch" type="number" min="1" max="60" step="0.5" value="15"></label>
+  <label>Quantité<input id="cq" type="number" min="1" max="20" value="1"></label>
+ </div>
+ <div class="row"><button class="s" id="cadd">Ajouter</button><button class="s" id="cexp">Exporter (JSON)</button><button class="s" id="cimpb">Importer</button><button class="s" id="cclr">Vider</button><input type="file" id="cimp" accept=".json" class="hid"></div>
+ <ul id="clist"></ul>
+ <p class="sub">Les pièces sont enregistrées dans ce navigateur. Chaque pièce est posée sous forme de rectangle à ses dimensions réelles ; le générateur choisit les types demandés, puis les pièces sont piochées dans la collection.</p>
+</details>
 <div class="row">
  <button id="go">Générer</button>
  <button class="s" id="svg">Exporter SVG</button>
@@ -74,7 +95,7 @@ footer{color:var(--mu);font-size:.8em;margin:16px 0}
 <div id="info"></div>
 <ol id="leg"></ol>
 <footer>Source : GF / AoF Advanced Rulebook v3.6.0. Les noms et icônes varient selon le jeu ; les effets de règle restent ceux des tableaux.<br>
-Hypothèses : pièces placées de la plus grande à la plus petite ; emplacements tirés au hasard (les joueurs choisiraient) ; style 1 : la pièce part du centre d'une zone et avance jusqu'à 2D6" vers une autre en s'arrêtant avant de passer à 6" ou moins d'une pièce ; le contrôle d'équilibre est une heuristique de l'outil, pas une règle.</footer>
+Ma collection : les types demandés par le générateur sont piochés dans la liste (une pièce n'est utilisée qu'une fois par table). Hypothèses : pièces placées de la plus grande à la plus petite ; emplacements tirés au hasard (les joueurs choisiraient) ; style 1 : la pièce part du centre d'une zone et avance jusqu'à 2D6" vers une autre en s'arrêtant avant de passer à 6" ou moins d'une pièce ; le contrôle d'équilibre est une heuristique de l'outil, pas une règle.</footer>
 
 <script>
 /*LOGIC*/
@@ -141,9 +162,9 @@ function place(list,style,W,H,org){
  const f=(x,y)=>dg===1?x*H-y*W:x*H+y*W-H*W;
  const halfOK=(p,s)=>[[-1,-1],[1,-1],[-1,1],[1,1]].every(([a,b])=>f(p.x+a*p.w/2,p.y+b*p.h/2)*s>0);
  const inSec=(p,s)=>{p.x=rnd(Math.max(s.x0,p.w/2),Math.max(Math.min(s.x1,W-p.w/2),Math.max(s.x0,p.w/2)));p.y=rnd(Math.max(s.y0,p.h/2),Math.max(Math.min(s.y1,H-p.h/2),Math.max(s.y0,p.h/2)));};
- list.forEach((t,i)=>{
-  let [w,h]=dims(T[t][4]);if(w!==h&&Math.random()<.5)[w,h]=[h,w];
-  const pts=org&&ORG.has(t)?shape(t,w,h):null,p={id:t,w,h,pts,area:pts?area(pts):w*h,x:0,y:0,by:style===4?"A":(i%2?"B":"A")};let ok=false;
+ list.forEach((it0,i)=>{const it=typeof it0==="string"?{id:it0}:it0,t=it.id;
+  let [w,h]=it.w?[it.w,it.h]:dims(T[t][4]);if(w!==h&&Math.random()<.5)[w,h]=[h,w];
+  const pts=!it.w&&org&&ORG.has(t)?shape(t,w,h):null,p={id:t,real:!!it.w,name:it.name,w,h,pts,area:pts?area(pts):w*h,x:0,y:0,by:style===4?"A":(i%2?"B":"A")};let ok=false;
   if(style===1){
    const s1=pick(secs),s2=pick(secs.length>1?secs.filter(s=>s!==s1):secs),a={x:(s1.x0+s1.x1)/2,y:(s1.y0+s1.y1)/2},b={x:(s2.x0+s2.x1)/2,y:(s2.y0+s2.y1)/2};
    const L=Math.hypot(b.x-a.x,b.y-a.y)||1,n=Math.min(R(6)+R(6),Math.floor(L));let best=null;
@@ -177,8 +198,12 @@ function audit(P,W,H){
  const bal=[["Équilibre couvert/vue gauche-droite (écart ≤ 2)",Math.abs(L-Rr)<=2,L+" / "+Rr],["Équilibre haut-bas (écart ≤ 2)",Math.abs(T2-B2)<=2,T2+" / "+B2]];
  return{chk,bal,ok:bal.every(x=>x[1])};}
 function build(o){
- LG=o.siz||[4,8];const[W,H]=o.tab,style=o.sty||d6(),list=genList(o.gen,o.n).sort((a,b)=>{const s=k=>{const d=T[k][4];return Array.isArray(d)?d[0]*d[1]:d==="S"?4:36};return s(b)-s(a)});
- const r=place(list,style,W,H,o.org);r.W=W;r.H=H;
+ LG=o.siz||[4,8];const[W,H]=o.tab,style=o.sty||d6();let list=genList(o.gen,o.n),col=null;
+ if(o.col){const pool=o.col.slice(),out=[],miss=[];
+  for(const id of list){const m=[];pool.forEach((c,k)=>{if(c.id===id)m.push(k)});if(m.length)out.push(pool.splice(pick(m),1)[0]);else{miss.push(id);if(o.fill)out.push(id);}}
+  col={used:out.filter(x=>typeof x!=="string").length,miss,fill:!!o.fill};list=out;}
+ list.sort((a,b)=>{const s=k=>{if(typeof k!=="string")return k.w*k.h;const d=T[k][4];return Array.isArray(d)?d[0]*d[1]:d==="S"?4:36};return s(b)-s(a)});
+ const r=place(list,style,W,H,o.org);r.W=W;r.H=H;r.col=col;
  ["A","B"].forEach(pl=>{const pool=r.P.filter(p=>!p.dng&&!T[p.id][3].includes("X"));for(let k=G[o.gen].danger?R(3):1;k>0&&pool.length;k--)pool.splice(Math.random()*pool.length|0,1)[0].dng=pl;});
  r.audit=audit(r.P,W,H);return r;}
 /*ENDLOGIC*/
@@ -188,6 +213,7 @@ const V={aof:{barricade:["Palissade","🪵"],wall:["Muret / clôture","🧱"],bl
  mines:["Champ de pièges","✹"],smog:["Brume maudite","☁"],toxriver:["Rivière empoisonnée","☣"],sludgestream:["Ruisseau de boue","〰"]},
  gf:{barricade:["Barricade","🚧"],blocker:["Bloc industriel","🏭"],building:["Grand bâtiment","🏢"],smallb:["Bloc de petits bâtiments","🏘"],ruins:["Ruines / débris","🏗"]}};
 const esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const pname=p=>p.real?p.name:ni(p.id)[0],pz=p=>p.real?szr(p.w,p.h):sz(p.w,p.h);
 function wrap(t,n){const o=[];let l="";for(const x of String(t).split(" ")){if(l&&(l+" "+x).length>n){o.push(l);l=x;}else l=l?l+" "+x:x;}if(l)o.push(l);return o;}
 function buildSVG(){
  const r=window.cur,hd=window.curHead,P=r.P,W=r.W,H=r.H,PW=794,M=20,CW=(PW-2*M)/3;
@@ -201,12 +227,13 @@ function buildSVG(){
   for(const l of wrap(t,120)){o.push(`<text x="${M}" y="${y+10}" font-size="11" fill="${col}">${esc(l)}</text>`);y+=14;}y+=3;}
  y+=8;
  for(let i0=0;i0<P.length;i0+=3){const row=P.slice(i0,i0+3).map((p,k)=>{const t=T[p.id],n=ni(p.id);
-   return{p,t,lines:[...wrap(`${i0+k+1}. ${n[1]} ${n[0]}`,30),`${sz(p.w,p.h)} — joueur ${p.by}`,...wrap([...tags(p)].map(c=>TG[c]).join(", ")+(p.dng?` (dangereux, choisi par ${p.dng})`:""),38)]};});
+   return{p,t,lines:[...wrap(`${i0+k+1}. ${n[1]} ${pname(p)}`,30),pz(p),...wrap([...tags(p)].map(c=>TG[c]).join(", "),38)]};});
   const hh=Math.max(...row.map(x=>x.lines.length))*13+10;
   row.forEach((x,k)=>{const cx=M+k*CW;o.push(`<rect x="${cx}" y="${y}" width="${CW-8}" height="${hh-4}" fill="#fff" stroke="#999" rx="3"/><rect x="${cx+6}" y="${y+7}" width="10" height="10" rx="2" fill="${x.t[2]}"/>`);
    x.lines.forEach((l,m)=>o.push(`<text x="${cx+22}" y="${y+16+m*13}" font-size="10.5"${m===0?' font-weight="700"':m>=2?' fill="#555"':""}>${esc(l)}</text>`));});y+=hh;}
  const Ht=Math.ceil(y+M);
  return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${PW} ${Ht}" width="${PW}" height="${Ht}" font-family="${ff}" fill="#111"><style>@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English&amp;family=Orbitron:wght@500;700&amp;display=swap');</style><rect width="${PW}" height="${Ht}" fill="#fff"/>${o.join("")}</svg>`;}
+const r1=x=>Math.round(x*10)/10,szr=(w,h)=>`${r1(w*2.54)}x${r1(h*2.54)} cm (${r1(w)}"x${r1(h)}")`;
 const ni=id=>(V[document.body.className]||{})[id]||[T[id][0],T[id][1]];
 function spath(pts,cx,cy){const n=pts.length,P=i=>pts[(i%n+n)%n],f=(a,b)=>`${(cx+a).toFixed(2)} ${(cy+b).toFixed(2)}`;let d=`M${f(...P(0))}`;
  for(let i=0;i<n;i++){const a=P(i-1),b=P(i),c=P(i+1),e=P(i+2);d+=`C${f(b[0]+(c[0]-a[0])/6,b[1]+(c[1]-a[1])/6)} ${f(c[0]-(e[0]-b[0])/6,c[1]-(e[1]-b[1])/6)} ${f(...c)}`;}return d+"Z";}
@@ -223,28 +250,43 @@ function render(r,tries){
   `<text x="${p.x-p.w/2+.6}" y="${p.y-p.h/2+2.1}" font-size="2.2" font-weight="700" fill="#fff" stroke="#000" stroke-width=".35" paint-order="stroke">${i+1}</text></g>`);});
  $("tb").setAttribute("viewBox",`-3 -3 ${W+6} ${H+6}`);$("tb").innerHTML=s.join("");
  let h=`<p><b>${STY[r.style]}</b> — ${P.length} pièce(s) posée(s), ${rem.length} retirée(s)${tries>1?`, ${tries} tirages`:""}.</p>`;
+ if(r.col)h+=`<p>Ma collection : ${r.col.used} pièce(s) utilisée(s)${r.col.miss.length?`, ${r.col.miss.length} type(s) manquant(s) (${Object.entries(r.col.miss.reduce((m,k)=>(m[k]=(m[k]||0)+1,m),{})).map(([k,n])=>ni(k)[0]+" ×"+n).join(", ")}) — ${r.col.fill?"complété(s) par des pièces génériques":"ignoré(s)"}`:""}.</p>`;
  if(r.style===3)h+=`<p>Restriction ${r.rest} : ${RES[r.rest]}.</p>`;
  if(r.style===4)h+=`<p>Le gagnant du jet place tout ; l'autre joueur choisit son côté de déploiement.</p>`;
- if(r.style===5)h+=`<p>Le gagnant du jet choisit sa moitié (diagonale en pointillé) ; A = gagnant, B = adversaire.</p>`;
- if(rem.length)h+=`<p class="tg">Retirées faute de place (règle : à plus de 6" (15 cm) des autres pièces) : ${rem.map(p=>ni(p.id)[0]).join(", ")}.</p>`;
+ if(r.style===5)h+=`<p>Le gagnant du jet choisit sa moitié (diagonale en pointillé).</p>`;
+ if(rem.length)h+=`<p class="tg">Retirées faute de place (règle : à plus de 6" (15 cm) des autres pièces) : ${rem.map(p=>pname(p)).join(", ")}.</p>`;
  const row=(a,t)=>`<p class="${a[1]?"ok":"ko"}">${a[1]?"✔":"✘"} ${a[0]} : ${a[2]}${t||""}</p>`;
  h+=r.audit.chk.map(a=>row(a)).join("")+r.audit.bal.map(a=>row(a)).join("");
  if(!r.audit.chk[3][1])h+=`<p class="tg">Surface : avec plus de 6" entre pièces, 25 % est quasi inatteignable sur 6'x4'. Mesuré sur le générateur générique : environ 11 % (4–8"), 16 % (5–10"), 19 % (6–12"), au prix de pièces retirées.</p>`;
  h+=`<p class="tg">Dimensions = rectangle englobant de la pièce (les formes naturelles sont inscrites dedans).</p><p class="tg">Recommandations du livre de règles (pour un choix manuel) ; les générateurs ne les garantissent pas. Les deux lignes d'équilibre sont une heuristique de l'outil.</p>`;
  const o=window.curO||{},jeu={aof:"Age of Fantasy",gf:"Grimdark Future"}[document.body.className]||"";
- const title=`Décors & plateau — ${jeu}`,sub=`Table ${sz(W,H)} · ${STY[r.style]} · générateur ${o.gen&&G[o.gen]?(o.gen==="libre"?"Libre":G[o.gen].nom):""} · grandes pièces ${(o.siz||[4,8]).join("–")}"`;
+ const title=`Décors & plateau — ${jeu}`,sub=`Table ${sz(W,H)} · ${STY[r.style]} · générateur ${o.gen&&G[o.gen]?(o.gen==="libre"?"Libre":G[o.gen].nom):""} · grandes pièces ${(o.siz||[4,8]).join("–")}"${o.col?" · source : ma collection":""}`;
  window.curHead={title,sub};$("ph").innerHTML=`<h2>${esc(title)}</h2><div>${esc(sub)}</div>`;
  $("info").innerHTML=h;
  window.curLines=[...h.matchAll(/<p(?: class="([^"]*)")?>(.*?)<\/p>/g)].map(m=>[m[1]||"",m[2].replace(/<[^>]+>/g,"")]);
- $("leg").innerHTML=P.map((p,i)=>{const t=T[p.id],nI=ni(p.id);return`<li><span class="sw" style="background:${t[2]}"></span><span><b>${i+1}. ${nI[1]} ${nI[0]}</b> — ${sz(p.w,p.h)} — joueur ${p.by}<br><span class="tg">${[...tags(p)].map(k=>TG[k]).join(", ")}${p.dng?` (dangereux, choisi par ${p.dng})`:""}</span></span></li>`}).join("");}
+ $("leg").innerHTML=P.map((p,i)=>{const t=T[p.id],nI=ni(p.id);return`<li><span class="sw" style="background:${t[2]}"></span><span><b>${i+1}. ${nI[1]} ${esc(pname(p))}</b> — ${pz(p)}<br><span class="tg">${[...tags(p)].map(k=>TG[k]).join(", ")}</span></span></li>`}).join("");}
 function go(){
- const o={tab:$("tab").value.split("x").map(Number),sty:+$("sty").value,gen:$("gen").value,siz:$("siz").value.split("-").map(Number),n:+$("n").value||15,org:$("org").checked};
+ const o={tab:$("tab").value.split("x").map(Number),sty:+$("sty").value,gen:$("gen").value,siz:$("siz").value.split("-").map(Number),n:+$("n").value||15,org:$("org").checked,fill:$("fill").checked,col:$("src").value==="col"?COL.flatMap(c=>Array.from({length:c.qty},()=>({id:c.id,name:c.nom||ni(c.id)[0],w:c.wcm/2.54,h:c.hcm/2.54}))):null};
  let r,n=0;do{r=build(o);n++;}while($("auto").checked&&!r.audit.ok&&n<60);
  window.cur=r;window.curO=o;render(r,n);}
+let COL=[];try{COL=JSON.parse(localStorage.getItem("opr-decors-collection")||"[]")||[];}catch(e){COL=[];}
+const saveCol=()=>{try{localStorage.setItem("opr-decors-collection",JSON.stringify(COL));}catch(e){}};
+function fillTypes(){const sel=$("ctype"),cur=sel.value;sel.innerHTML=Object.keys(T).map(id=>`<option value="${id}">${ni(id)[1]} ${esc(ni(id)[0])}</option>`).join("");if(cur)sel.value=cur;}
+function drawCol(){$("ccount").textContent=COL.reduce((a,c)=>a+c.qty,0);
+ $("clist").innerHTML=COL.map((c,i)=>`<li><span>${ni(c.id)[1]} <b>${esc(c.nom||ni(c.id)[0])}</b> — ${c.wcm}x${c.hcm} cm × ${c.qty}</span><button class="x" data-i="${i}" aria-label="Supprimer">✕</button></li>`).join("");}
+$("cadd").onclick=()=>{const w=+$("cw").value,h=+$("ch").value,q=Math.max(1,Math.min(20,+$("cq").value||1));if(!(w>0&&h>0))return;
+ COL.push({id:$("ctype").value,nom:$("cname").value.trim(),wcm:w,hcm:h,qty:q});saveCol();drawCol();$("cname").value="";};
+$("clist").onclick=e=>{const i=e.target.dataset&&e.target.dataset.i;if(i!==undefined){COL.splice(+i,1);saveCol();drawCol();}};
+$("cclr").onclick=()=>{COL=[];saveCol();drawCol();};
+$("cexp").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(COL,null,1)],{type:"application/json"}));a.download="collection-decors-opr.json";a.click();};
+$("cimpb").onclick=()=>$("cimp").click();
+$("cimp").onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const a=JSON.parse(rd.result);
+ if(Array.isArray(a)){COL=a.filter(c=>c&&T[c.id]&&c.wcm>0&&c.hcm>0).map(c=>({id:c.id,nom:String(c.nom||"").slice(0,40),wcm:+c.wcm,hcm:+c.hcm,qty:Math.max(1,Math.min(20,+c.qty||1))}));saveCol();drawCol();}}catch(x){}};rd.readAsText(f);e.target.value="";};
 $("go").onclick=go;
 $("pdf").onclick=()=>{const t=document.title;document.title="Plateau OPR - "+({aof:"AoF",gf:"GF"}[document.body.className]||"");window.onafterprint=()=>{document.title=t;};window.print();};
-$("jeu").onchange=()=>{document.body.className=$("jeu").value;if(window.cur)render(window.cur,1);};
+$("jeu").onchange=()=>{document.body.className=$("jeu").value;fillTypes();drawCol();if(window.cur)render(window.cur,1);};
 $("svg").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([buildSVG()],{type:"image/svg+xml"}));a.download="plateau-opr.svg";a.click();};
+fillTypes();drawCol();
 go();
 </script>
 </body>
