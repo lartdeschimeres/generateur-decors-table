@@ -55,7 +55,7 @@ Source : GF / AoF Advanced Rulebook v3.6.0 (placement, générateurs de terrain,
 
 ## ⚠️ À propos des droits
 
-Ce dépôt contient des éléments dérivés de l'**Advanced Rulebook** d'OPR Games (noms et composition des tableaux de décors, recommandations de terrain), un contenu proposé via leur Patreon (donc non gratuit). Cet outil est un projet de fan, non affilié à OPR Games. Avant de rendre ce dépôt public, vérifiez les conditions d'utilisation communautaire d'OPR Games concernant la republication de ce contenu — je n'ai pas pu confirmer si cette diffusion est autorisée par leurs règles.
+Ce dépôt contient des éléments dérivés de l'**Advanced Rulebook** d'OPR Games (noms et composition des tableaux de décors, recommandations de terrain), un contenu proposé via leur Patreon (donc non gratuit). Cet outil est un projet de fan, non affilié à OPR Games.
 
 ## Licence
 
