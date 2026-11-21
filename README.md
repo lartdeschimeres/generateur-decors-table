@@ -2,9 +2,15 @@
 
 Outil web, en un seul fichier HTML, qui tire des décors et propose une mise en place du plateau pour **Age of Fantasy** et **Grimdark Future** (One Page Rules), à partir des règles avancées v3.6.0.
 
+**[Ouvrir l'outil en ligne](https://lartdeschimeres.github.io/generateur-decors-table/)**
+
 > Projet de fan, non officiel et non affilié à One Page Rules. Les règles, noms et marques appartiennent à leurs propriétaires.
 
 ## Utilisation
+
+En ligne : https://lartdeschimeres.github.io/generateur-decors-table/
+
+En local :
 
 1. Télécharger `index.html` et l'ouvrir dans un navigateur récent (aucune installation, aucun serveur).
 2. Choisir le jeu, la taille de table, le style de placement, le générateur de décors et la taille des grandes pièces.
