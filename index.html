@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Décors & plateau — OPR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Orbitron:wght@500;700&display=swap">
+<style>
+:root{--bg:#14171a;--pn:#1e2328;--ln:#343c44;--tx:#e6e2d8;--mu:#9aa3aa;--ac:#c9a24b;--felt:#38432f}
+body.aof{--ff:"IM Fell English",Georgia,"Times New Roman",serif;--fs:16px}
+body.gf{--ac:#4fb3c8;--felt:#2d3a40;--ff:Orbitron,"Segoe UI",system-ui,sans-serif;--fs:13px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:var(--fs,15px)/1.5 var(--ff,system-ui,sans-serif);padding:12px;max-width:1100px;margin:auto}
+h1{font:700 1.5em/1.2 var(--ff);margin:4px 0}
+.sub{color:var(--mu);margin:0 0 12px;font-size:.85em}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;background:var(--pn);padding:10px;border:1px solid var(--ln);border-radius:6px}
+label{display:flex;flex-direction:column;font-size:.8em;color:var(--mu);gap:3px}
+select,input[type=number],input[type=text]{background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:4px;padding:7px;font:inherit}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;align-items:center}
+button{background:var(--ac);color:#111;border:0;border-radius:4px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
+button.s{background:var(--pn);color:var(--tx);border:1px solid var(--ln);font-weight:500}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.chk{flex-direction:row;align-items:center;font-size:.85em}
+svg{width:100%;height:auto;display:block;border:1px solid var(--ln);border-radius:4px;background:#0e1113}
+#info{margin:10px 0;font-size:.95em}
+#info p{margin:3px 0}
+.ok{color:#7fc47f}.ko{color:#e08a6a}
+ol{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px}
+li{background:var(--pn);border:1px solid var(--ln);border-radius:4px;padding:7px 9px;font-size:.88em;display:flex;gap:8px;align-items:flex-start}
+li b{font-weight:600}
+.sw{width:14px;height:14px;border-radius:3px;flex:none;margin-top:3px}
+.tg{color:var(--mu)}
+footer{color:var(--mu);font-size:.8em;margin:16px 0}
+#ph{display:none}
+details{margin:10px 0;background:var(--pn);border:1px solid var(--ln);border-radius:6px;padding:8px 10px}
+summary{cursor:pointer;font-weight:600}
+#clist{list-style:none;padding:0;margin:6px 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px}
+.x{margin-left:auto;background:none;border:0;color:var(--mu);cursor:pointer;padding:0 6px;font:inherit;font-weight:700}
+.hid{display:none}
+@page{size:A4 portrait;margin:10mm}
+#pp{display:none}
+@media print{
+ *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ html,body{background:#fff!important;padding:0;margin:0;max-width:none;height:auto}
+ body>*:not(#pp){display:none!important}
+ #pp{display:block;width:190mm;height:274mm;overflow:hidden;break-inside:avoid;page-break-inside:avoid}
+ #pp svg{display:block;width:190mm;height:274mm;border:0;border-radius:0;background:#fff}
+}
+
+</style>
+</head>
+<body class="aof">
+<h1>Décors &amp; plateau</h1>
+<p class="sub">Règles avancées v3.6.0 — Terrain avancé (placement, générateurs)</p>
+
+<div class="ctl">
+ <label>Jeu<select id="jeu"><option value="aof">Age of Fantasy</option><option value="gf">Grimdark Future</option></select></label>
+ <label>Table<select id="tab"><option value="72x48">6'x4' (72"x48" — 183x122 cm)</option><option value="48x48">4'x4' (48"x48" — 122x122 cm)</option><option value="36x36">3'x3' (36"x36" — 91x91 cm)</option></select></label>
+ <label>Style de placement<select id="sty"><option value="0">Tirage (1D6)</option><option value="1">1. Aléatoire</option><option value="2">2. Alternée (libre)</option><option value="3">3. Alternée (restreinte)</option><option value="4">4. Table entière</option><option value="5">5. Deux moitiés</option><option value="6">6. Six carrés</option></select></label>
+ <label>Générateur de décors<select id="gen"><option value="generic">Générique</option><option value="hospitable">Hospitalier</option><option value="wasteland">Désolation</option><option value="death">Mortel</option><option value="libre">Libre (N pièces)</option></select></label>
+ <label>Taille des grandes pièces<select id="siz"><option value="4-8">Standard 4–8" (10–20 cm)</option><option value="5-10" selected>Grandes 5–10" (13–25 cm)</option><option value="6-12">Très grandes 6–12" (15–30 cm)</option></select></label>
+ <label>N pièces (mode libre)<input id="n" type="number" min="8" max="30" value="15"></label>
+</div>
+<div class="ctl">
+ <label>Source des décors<select id="src"><option value="gen">Générateur (icônes abstraites)</option><option value="col">Ma collection</option></select></label>
+ <label class="chk"><input type="checkbox" id="fill" checked>&nbsp;Compléter avec des pièces génériques si un type manque</label>
+</div>
+<details id="colbox"><summary>Ma collection de décors (<span id="ccount">0</span> pièce(s))</summary>
+ <div class="ctl" style="margin-top:8px">
+  <label>Type<select id="ctype"></select></label>
+  <label>Nom (facultatif)<input id="cname" type="text" maxlength="40"></label>
+  <label>Longueur (cm)<input id="cw" type="number" min="1" max="60" step="0.5" value="20"></label>
+  <label>Largeur (cm)<input id="ch" type="number" min="1" max="60" step="0.5" value="15"></label>
+  <label>Quantité<input id="cq" type="number" min="1" max="20" value="1"></label>
+ </div>
+ <div class="row"><button class="s" id="cadd">Ajouter</button><button class="s" id="cexp">Exporter (JSON)</button><button class="s" id="cimpb">Importer</button><button class="s" id="cclr">Vider</button><input type="file" id="cimp" accept=".json" class="hid"></div>
+ <ul id="clist"></ul>
+ <p class="sub">Les pièces sont enregistrées dans ce navigateur. Chaque pièce est posée sous forme de rectangle à ses dimensions réelles ; le générateur choisit les types demandés, puis les pièces sont piochées dans la collection.</p>
+</details>
+<div class="row">
+ <button id="go">Générer</button>
+ <button class="s" id="svg">Exporter SVG</button>
+ <button class="s" id="pdf">Exporter PDF</button>
+ <label class="chk"><input type="checkbox" id="org" checked>&nbsp;Formes naturelles</label>
+ <label class="chk"><input type="checkbox" id="auto" checked>&nbsp;Relancer jusqu'à un équilibre correct</label>
+</div>
+
+<div id="ph"></div>
+<div id="pp"></div>
+<svg id="tb" role="img" aria-label="Plan du plateau"></svg>
+<div id="info"></div>
+<ol id="leg"></ol>
+<footer>Source : GF / AoF Advanced Rulebook v3.6.0. Les noms et icônes varient selon le jeu ; les effets de règle restent ceux des tableaux.<br>
+Ma collection : les types demandés par le générateur sont piochés dans la liste (une pièce n'est utilisée qu'une fois par table). Hypothèses : pièces placées de la plus grande à la plus petite ; emplacements tirés au hasard (les joueurs choisiraient) ; style 1 : la pièce part du centre d'une zone et avance jusqu'à 2D6" vers une autre en s'arrêtant avant de passer à 6" ou moins d'une pièce ; le contrôle d'équilibre est une heuristique de l'outil, pas une règle.</footer>
+
+<script>
+/*LOGIC*/
+const R=n=>Math.floor(Math.random()*n)+1,d6=()=>R(6),pick=a=>a[Math.random()*a.length|0],rnd=(a,b)=>a+Math.random()*(b-a);
+const TG={B:"Bloque la vue",C:"Couvert",D:"Difficile",X:"Dangereux",I:"Infranchissable",N:"Dense",U:"Instable",S:"Escarpé"};
+// id:[nom,icône,couleur,tags,dimensions]
+const T={
+barricade:["Barricade","▬","#8a7a5a","C",[3,2]],wall:["Mur / clôture","▭","#8a7a5a","CD",[8,1]],
+forest:["Forêt","🌲","#3f6b3a","CDN","L"],plantation:["Plantation","🌳","#4a7a3a","CDN","L"],field:["Champ","🌾","#a89a45","CD","L"],
+blocker:["Écran bloquant","◼","#5b6168","B","L"],hill:["Colline","⛰","#7d8a52","CS","L"],steephill:["Colline escarpée","⛰","#6b6f45","CSU","L"],
+ruins:["Ruines","🏚","#7a6f66","CU","L"],lake:["Lac profond","🌊","#2f6f9a","I","L"],river:["Rivière peu profonde","〰","#3f86b5","D",[4,16]],
+building:["Grand bâtiment","🏢","#555b66","BI","L"],smallb:["Petits bâtiments","🏘","#5f5a66","BI","L"],
+toxriver:["Rivière toxique","☣","#6aa040","DX",[4,16]],sludgestream:["Ruisseau de boue / canal","☣","#7a7a2f","X",[4,16]],
+sludgefield:["Champ de boue","〰","#7a6a3a","D","L"],rock:["Gros rocher","🪨","#6e665e","BI","L"],srock:["Petit rocher","🪨","#6e665e","BI","S"],
+dunes:["Dunes","◠","#c2a56b","CS","L"],crater:["Cratère","◉","#7a6a58","C","L"],smog:["Brouillard toxique","☁","#8fa23a","CXN","L"],
+mines:["Champ de mines","✹","#a64b3c","X","L"],marsh:["Marais mortel","☠","#4f5f3a","DX","L"],crumbly:["Roche friable","▲","#7b6b5a","D","L"],
+ovruins:["Ruines envahies","🏚","#55663f","CD","L"],deadveg:["Végétation mortelle","🥀","#7a3f5a","CDX","L"],
+denseveg:["Végétation dense","🌿","#2f6b4a","CDN","L"],lair:["Antre de bête","🐾","#8a4a3a","X","L"],quicksand:["Sables mouvants","〰","#b08a4a","U","L"]};
+const G={
+generic:{nom:"Générique",base:[[2,["barricade"]],[2,["forest","field"]],[5,["blocker"]]],danger:true,
+ tab:{2:"hill",3:"hill",4:"ruins",5:"field",6:"barricade",7:"barricade",8:"barricade",9:"forest",10:"blocker",11:"lake",12:"lake"}},
+hospitable:{nom:"Hospitalier",base:[[2,["wall"]],[2,["hill","plantation"]],[5,["forest","building"]]],
+ tab:{2:"lake",3:"river",4:"field",5:"ruins",6:["forest","plantation"],7:["hill","forest","field"],8:"hill",9:"wall",10:"building",11:"smallb",12:"steephill"}},
+wasteland:{nom:"Désolation",base:[[2,["dunes"]],[2,["rock","crater"]],[5,["building","smog"]]],
+ tab:{2:"toxriver",3:"sludgestream",4:"sludgefield",5:"ruins",6:"ROCKS",7:"dunes",8:"crater",9:"smog",10:"building",11:"mines",12:"smallb"}},
+death:{nom:"Mortel",base:[[2,["ovruins"]],[2,["deadveg","hill"]],[5,["denseveg","steephill"]]],
+ tab:{2:"marsh",3:"crumbly",4:"ovruins",5:"deadveg",6:"denseveg",7:["denseveg","hill"],8:"hill",9:"smallb",10:"steephill",11:"lair",12:"quicksand"}}};
+G.libre=G.generic;
+const STY=["","Aléatoire","Alternée (libre)","Alternée (restreinte)","Table entière","Deux moitiés","Six carrés"];
+const RES=["","Aucun décor à moins de 12\" (30 cm) du centre","Aucun décor à moins de 12\" (30 cm) du bord","1re pièce au centre, les autres à plus de 12\" (30 cm) d'elle","1re pièce au centre, les autres à 9\" (23 cm) ou moins d'une pièce déjà posée","Les 4 premières pièces à 12\" (30 cm) ou moins d'un coin différent","Les 4 premières pièces dans un quart de table différent"];
+
+let LG=[4,8];
+function dims(d){if(Array.isArray(d))return d.slice();const q=Math.round;return d==="S"?[q(rnd(1,3)),q(rnd(1,3))]:[q(rnd(LG[0],LG[1])),q(rnd(LG[0],LG[1]))];}
+const cm=x=>Math.round(x*2.54),sz=(w,h)=>`${w}"x${h}" (${cm(w)}x${cm(h)} cm)`;
+const ORG=new Set(["forest","plantation","field","hill","steephill","lake","river","toxriver","sludgestream","sludgefield","dunes","crater","smog","mines","marsh","crumbly","deadveg","denseveg","lair","quicksand","rock","srock"]);
+const LONG=new Set(["river","toxriver","sludgestream"]);
+function fit(pts,w,h){const xs=pts.map(a=>a[0]),ys=pts.map(a=>a[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+ return pts.map(([x,y])=>[(x-(x0+x1)/2)*w/(x1-x0||1),(y-(y0+y1)/2)*h/(y1-y0||1)]);}
+function shape(id,w,h){
+ let pts=[];
+ if(LONG.has(id)){ // bande sinueuse, axe long le long de x puis rotation si besoin
+  const L=Math.max(w,h),t=Math.min(w,h),amp=t*rnd(.3,.6),ph=rnd(0,6.3),fq=rnd(1,2),n=9,top=[],bot=[];
+  for(let i=0;i<n;i++){const x=-L/2+L*i/(n-1),c=amp*Math.sin(ph+fq*6.283*i/(n-1)),e=i===0||i===n-1?.5:1;
+   top.push([x,c-t/2*e*rnd(.7,1)]);bot.push([x,c+t/2*e*rnd(.7,1)]);}
+  pts=top.concat(bot.reverse());if(w<h)pts=pts.map(([x,y])=>[y,x]);
+ }else{const n=R(5)+9;for(let i=0;i<n;i++){const a=6.283*i/n+rnd(-.12,.12),r=rnd(.66,1);pts.push([Math.cos(a)*r,Math.sin(a)*r]);}}
+ return fit(pts,w,h);}
+function area(pts){let a=0;for(let i=0;i<pts.length;i++){const[p,q]=[pts[i],pts[(i+1)%pts.length]];a+=p[0]*q[1]-q[0]*p[1];}return Math.abs(a)/2;}
+function tags(p){return [...new Set(T[p.id][3]+(p.dng?"X":""))].join("");}
+function genList(g,N){
+ const o=[],c=G[g];
+ for(const [n,ids] of c.base)for(let i=0;i<n;i++)o.push(pick(ids));
+ const add=v=>{if(v==="ROCKS"){if(R(2)===1)o.push("rock");else for(let j=R(2)+1;j>0;j--)o.push("srock");}else o.push(Array.isArray(v)?pick(v):v);};
+ for(let k=R(3)+R(3)+R(3)+R(3);k>0;k--)add(c.tab[R(6)+R(6)]);
+ if(g==="libre"&&N){while(o.length<N)add(c.tab[R(6)+R(6)]);while(o.length>N)o.pop();}
+ return o;}
+function rg(a,b){const dx=Math.max(0,Math.abs(a.x-b.x)-(a.w+b.w)/2),dy=Math.max(0,Math.abs(a.y-b.y)-(a.h+b.h)/2);return Math.hypot(dx,dy);}
+function place(list,style,W,H,org){
+ const P=[],rem=[],cols=Math.max(1,Math.round(W/24)),rows=Math.max(1,Math.round(H/24)),secs=[];
+ for(let i=0;i<cols;i++)for(let j=0;j<rows;j++)secs.push({x0:i*W/cols,x1:(i+1)*W/cols,y0:j*H/rows,y1:(j+1)*H/rows});
+ const clear=p=>P.every(q=>rg(p,q)>6),inside=(p,m)=>p.x-p.w/2>=m&&p.x+p.w/2<=W-m&&p.y-p.h/2>=m&&p.y+p.h/2<=H-m;
+ const pt=(x,y)=>({x,y,w:0,h:0}),rest=style===3?d6():0,dg=style===5?R(2):0;
+ const corners=[[0,0],[W,0],[0,H],[W,H]].sort(()=>Math.random()-.5),quarters=[0,1,2,3].sort(()=>Math.random()-.5);
+ const f=(x,y)=>dg===1?x*H-y*W:x*H+y*W-H*W;
+ const halfOK=(p,s)=>[[-1,-1],[1,-1],[-1,1],[1,1]].every(([a,b])=>f(p.x+a*p.w/2,p.y+b*p.h/2)*s>0);
+ const inSec=(p,s)=>{p.x=rnd(Math.max(s.x0,p.w/2),Math.max(Math.min(s.x1,W-p.w/2),Math.max(s.x0,p.w/2)));p.y=rnd(Math.max(s.y0,p.h/2),Math.max(Math.min(s.y1,H-p.h/2),Math.max(s.y0,p.h/2)));};
+ list.forEach((it0,i)=>{const it=typeof it0==="string"?{id:it0}:it0,t=it.id;
+  let [w,h]=it.w?[it.w,it.h]:dims(T[t][4]);if(w!==h&&Math.random()<.5)[w,h]=[h,w];
+  const pts=!it.w&&org&&ORG.has(t)?shape(t,w,h):null,p={id:t,real:!!it.w,name:it.name,w,h,pts,area:pts?area(pts):w*h,x:0,y:0,by:style===4?"A":(i%2?"B":"A")};let ok=false;
+  if(style===1){
+   const s1=pick(secs),s2=pick(secs.length>1?secs.filter(s=>s!==s1):secs),a={x:(s1.x0+s1.x1)/2,y:(s1.y0+s1.y1)/2},b={x:(s2.x0+s2.x1)/2,y:(s2.y0+s2.y1)/2};
+   const L=Math.hypot(b.x-a.x,b.y-a.y)||1,n=Math.min(R(6)+R(6),Math.floor(L));let best=null;
+   for(let k=0;k<=n;k++){p.x=a.x+(b.x-a.x)*k/L;p.y=a.y+(b.y-a.y)*k/L;if(clear(p)&&inside(p,0))best={x:p.x,y:p.y};else if(best)break;}
+   if(best){p.x=best.x;p.y=best.y;ok=true;}
+  }else if(style===3&&(rest===3||rest===4)&&i===0){p.x=W/2;p.y=H/2;ok=true;}
+  else for(let k=0;k<800&&!ok;k++){
+   if(style===6)inSec(p,pick(secs));
+   else if(style===3&&rest===6&&i<4){const q=quarters[i];inSec(p,{x0:(q%2)*W/2,x1:(q%2+1)*W/2,y0:(q>>1)*H/2,y1:((q>>1)+1)*H/2});}
+   else{p.x=rnd(p.w/2,W-p.w/2);p.y=rnd(p.h/2,H-p.h/2);}
+   let t2=clear(p);
+   if(style===4)t2=t2&&inside(p,6);
+   if(style===5)t2=t2&&inside(p,6)&&halfOK(p,p.by==="A"?1:-1);
+   if(style===3){
+    if(rest===1)t2=t2&&rg(p,pt(W/2,H/2))>=12;
+    if(rest===2)t2=t2&&inside(p,12);
+    if(rest===3)t2=t2&&rg(p,P[0])>12;
+    if(rest===4)t2=t2&&P.some(q=>rg(p,q)<=9);
+    if(rest===5&&i<4)t2=t2&&rg(p,pt(...corners[i]))<=12;
+   }
+   ok=t2;
+  }
+  (ok?P:rem).push(p);
+ });
+ return{P,rem,style,rest,dg};}
+function audit(P,W,H){
+ const n=P.length||1,c=k=>P.filter(p=>tags(p).includes(k)).length/n,cov=P.reduce((s,p)=>s+p.area,0)/(W*H);
+ const cv=P.filter(p=>/[BC]/.test(tags(p))),L=cv.filter(p=>p.x<W/2).length,Rr=cv.length-L,T2=cv.filter(p=>p.y<H/2).length,B2=cv.length-T2;
+ const pc=x=>Math.round(x*100)+" %";
+ const chk=[["Bloque la vue ≥ 50 %",c("B")>=.5,pc(c("B"))],["Couvert ≥ 33 %",c("C")>=.33,pc(c("C"))],["Difficile ≥ 33 %",c("D")>=.33,pc(c("D"))],["Surface ≥ 25 % de la table",cov>=.25,pc(cov)]];
+ const bal=[["Équilibre couvert/vue gauche-droite (écart ≤ 2)",Math.abs(L-Rr)<=2,L+" / "+Rr],["Équilibre haut-bas (écart ≤ 2)",Math.abs(T2-B2)<=2,T2+" / "+B2]];
+ return{chk,bal,ok:bal.every(x=>x[1])};}
+function build(o){
+ LG=o.siz||[4,8];const[W,H]=o.tab,style=o.sty||d6();let list=genList(o.gen,o.n),col=null;
+ if(o.col){const pool=o.col.slice(),out=[],miss=[];
+  for(const id of list){const m=[];pool.forEach((c,k)=>{if(c.id===id)m.push(k)});if(m.length)out.push(pool.splice(pick(m),1)[0]);else{miss.push(id);if(o.fill)out.push(id);}}
+  col={used:out.filter(x=>typeof x!=="string").length,miss,fill:!!o.fill};list=out;}
+ list.sort((a,b)=>{const s=k=>{if(typeof k!=="string")return k.w*k.h;const d=T[k][4];return Array.isArray(d)?d[0]*d[1]:d==="S"?4:36};return s(b)-s(a)});
+ const r=place(list,style,W,H,o.org);r.W=W;r.H=H;r.col=col;
+ ["A","B"].forEach(pl=>{const pool=r.P.filter(p=>!p.dng&&!T[p.id][3].includes("X"));for(let k=G[o.gen].danger?R(3):1;k>0&&pool.length;k--)pool.splice(Math.random()*pool.length|0,1)[0].dng=pl;});
+ r.audit=audit(r.P,W,H);return r;}
+/*ENDLOGIC*/
+
+const $=id=>document.getElementById(id);
+const V={aof:{barricade:["Palissade","🪵"],wall:["Muret / clôture","🧱"],blocker:["Falaise / muraille","🗻"],building:["Grande bâtisse / tour","🏰"],smallb:["Hameau","🛖"],
+ mines:["Champ de pièges","✹"],smog:["Brume maudite","☁"],toxriver:["Rivière empoisonnée","☣"],sludgestream:["Ruisseau de boue","〰"]},
+ gf:{barricade:["Barricade","🚧"],blocker:["Bloc industriel","🏭"],building:["Grand bâtiment","🏢"],smallb:["Bloc de petits bâtiments","🏘"],ruins:["Ruines / débris","🏗"]}};
+const esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const pname=p=>p.real?p.name:ni(p.id)[0],pz=p=>p.real?szr(p.w,p.h):sz(p.w,p.h);
+function wrap(t,n){const o=[];let l="";for(const x of String(t).split(" ")){if(l&&(l+" "+x).length>n){o.push(l);l=x;}else l=l?l+" "+x:x;}if(l)o.push(l);return o;}
+function buildSVG(){
+ const r=window.cur,hd=window.curHead,P=r.P,W=r.W,H=r.H,PW=794,M=20,NC=P.length>18?4:3,CW=(PW-2*M)/NC;
+ const ff=((getComputedStyle(document.body).fontFamily)||"sans-serif").replace(/"/g,"'");
+ const sc=Math.min((PW-2*M)/(W+6),566/(H+6)),pw=(W+6)*sc,ph=(H+6)*sc,ox=(PW-pw)/2,o=[];let y=M;
+ o.push(`<text x="${M}" y="${y+16}" font-size="20" font-weight="700">${esc(hd.title)}</text>`);y+=26;
+ wrap(hd.sub,105).forEach(l=>{o.push(`<text x="${M}" y="${y+12}" font-size="12.5">${esc(l)}</text>`);y+=17;});y+=8;
+ const plan=$("tb").innerHTML.replace(/var\(--felt\)/g,"#e4e7de").replace(/stroke="#ffffff"/g,'stroke="#444"').replace(/stroke="#e6e2d8"/g,'stroke="#444"');
+ o.push(`<rect x="${ox}" y="${y}" width="${pw}" height="${ph}" fill="#fff" stroke="#999"/><g transform="translate(${ox} ${y}) scale(${sc}) translate(3 3)">${plan}</g>`);y+=ph+18;
+ for(const[c,t]of window.curLines){const col=c==="ok"?"#2e7d32":c==="ko"?"#b5482a":c==="tg"?"#555":"#111";
+  for(const l of wrap(t,120)){o.push(`<text x="${M}" y="${y+10}" font-size="11" fill="${col}">${esc(l)}</text>`);y+=14;}y+=3;}
+ y+=8;
+ for(let i0=0;i0<P.length;i0+=NC){const row=P.slice(i0,i0+NC).map((p,k)=>{const t=T[p.id],n=ni(p.id);
+   return{p,t,lines:[...wrap(`${i0+k+1}. ${n[1]} ${pname(p)}`,NC===4?24:30),pz(p),...wrap([...tags(p)].map(c=>TG[c]).join(", "),NC===4?27:38)]};});
+  const hh=Math.max(...row.map(x=>x.lines.length))*13+10;
+  row.forEach((x,k)=>{const cx=M+k*CW;o.push(`<rect x="${cx}" y="${y}" width="${CW-8}" height="${hh-4}" fill="#fff" stroke="#999" rx="3"/><rect x="${cx+6}" y="${y+7}" width="10" height="10" rx="2" fill="${x.t[2]}"/>`);
+   x.lines.forEach((l,m)=>o.push(`<text x="${cx+22}" y="${y+16+m*13}" font-size="10.5"${m===0?' font-weight="700"':m>=2?' fill="#555"':""}>${esc(l)}</text>`));});y+=hh;}
+ const Ht=Math.ceil(y+M);
+ return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${PW} ${Ht}" preserveAspectRatio="xMidYMin meet" width="${PW}" height="${Ht}" font-family="${ff}" fill="#111"><style>@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English&amp;family=Orbitron:wght@500;700&amp;display=swap');</style><rect width="${PW}" height="${Ht}" fill="#fff"/>${o.join("")}</svg>`;}
+const r1=x=>Math.round(x*10)/10,szr=(w,h)=>`${r1(w*2.54)}x${r1(h*2.54)} cm (${r1(w)}"x${r1(h)}")`;
+const ni=id=>(V[document.body.className]||{})[id]||[T[id][0],T[id][1]];
+function spath(pts,cx,cy){const n=pts.length,P=i=>pts[(i%n+n)%n],f=(a,b)=>`${(cx+a).toFixed(2)} ${(cy+b).toFixed(2)}`;let d=`M${f(...P(0))}`;
+ for(let i=0;i<n;i++){const a=P(i-1),b=P(i),c=P(i+1),e=P(i+2);d+=`C${f(b[0]+(c[0]-a[0])/6,b[1]+(c[1]-a[1])/6)} ${f(c[0]-(e[0]-b[0])/6,c[1]-(e[1]-b[1])/6)} ${f(...c)}`;}return d+"Z";}
+function render(r,tries){
+ const{W,H,P,rem}=r,s=[];
+ s.push(`<rect x="0" y="0" width="${W}" height="${H}" fill="var(--felt)" stroke="#8a8f94" stroke-width=".6"/>`);
+ for(let x=12;x<W;x+=12)s.push(`<line x1="${x}" y1="0" x2="${x}" y2="${H}" stroke="#ffffff" stroke-opacity=".07" stroke-width=".25"/>`);
+ for(let y=12;y<H;y+=12)s.push(`<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="#ffffff" stroke-opacity=".07" stroke-width=".25"/>`);
+ if(r.dg)s.push(r.dg===1?`<line x1="0" y1="0" x2="${W}" y2="${H}" stroke="#e6e2d8" stroke-dasharray="2 1.5" stroke-width=".4"/>`:`<line x1="0" y1="${H}" x2="${W}" y2="0" stroke="#e6e2d8" stroke-dasharray="2 1.5" stroke-width=".4"/>`);
+ P.forEach((p,i)=>{const t=T[p.id],nI=ni(p.id),fs=Math.max(1.8,Math.min(p.w,p.h)*.62);
+  const st=`fill="${t[2]}" fill-opacity=".9" stroke="${p.dng?"#ff6a4a":"#10151a"}" stroke-width="${p.dng?.7:.35}" ${p.dng?'stroke-dasharray="1.2 .8"':""}`;
+  s.push(`<g>`+(p.pts?`<path d="${spath(p.pts,p.x,p.y)}" ${st}/>`:`<rect x="${p.x-p.w/2}" y="${p.y-p.h/2}" width="${p.w}" height="${p.h}" rx=".8" ${st}/>`)+
+  `<text x="${p.x}" y="${p.y}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#fff">${nI[1]}</text>`+
+  `<text x="${p.x-p.w/2+.6}" y="${p.y-p.h/2+2.1}" font-size="2.2" font-weight="700" fill="#fff" stroke="#000" stroke-width=".35" paint-order="stroke">${i+1}</text></g>`);});
+ $("tb").setAttribute("viewBox",`-3 -3 ${W+6} ${H+6}`);$("tb").innerHTML=s.join("");
+ let h=`<p><b>${STY[r.style]}</b> — ${P.length} pièce(s) posée(s), ${rem.length} retirée(s)${tries>1?`, ${tries} tirages`:""}.</p>`;
+ if(r.col)h+=`<p>Ma collection : ${r.col.used} pièce(s) utilisée(s)${r.col.miss.length?`, ${r.col.miss.length} type(s) manquant(s) (${Object.entries(r.col.miss.reduce((m,k)=>(m[k]=(m[k]||0)+1,m),{})).map(([k,n])=>ni(k)[0]+" ×"+n).join(", ")}) — ${r.col.fill?"complété(s) par des pièces génériques":"ignoré(s)"}`:""}.</p>`;
+ if(r.style===3)h+=`<p>Restriction ${r.rest} : ${RES[r.rest]}.</p>`;
+ if(r.style===4)h+=`<p>Le gagnant du jet place tout ; l'autre joueur choisit son côté de déploiement.</p>`;
+ if(r.style===5)h+=`<p>Le gagnant du jet choisit sa moitié (diagonale en pointillé).</p>`;
+ if(rem.length)h+=`<p class="tg">Retirées faute de place (règle : à plus de 6" (15 cm) des autres pièces) : ${rem.map(p=>pname(p)).join(", ")}.</p>`;
+ const row=(a,t)=>`<p class="${a[1]?"ok":"ko"}">${a[1]?"✔":"✘"} ${a[0]} : ${a[2]}${t||""}</p>`;
+ h+=r.audit.chk.map(a=>row(a)).join("")+r.audit.bal.map(a=>row(a)).join("");
+ if(!r.audit.chk[3][1])h+=`<p class="tg">Surface : avec plus de 6" entre pièces, 25 % est quasi inatteignable sur 6'x4'. Mesuré sur le générateur générique : environ 11 % (4–8"), 16 % (5–10"), 19 % (6–12"), au prix de pièces retirées.</p>`;
+ h+=`<p class="tg">Dimensions = rectangle englobant de la pièce (les formes naturelles sont inscrites dedans).</p><p class="tg">Recommandations du livre de règles (pour un choix manuel) ; les générateurs ne les garantissent pas. Les deux lignes d'équilibre sont une heuristique de l'outil.</p>`;
+ const o=window.curO||{},jeu={aof:"Age of Fantasy",gf:"Grimdark Future"}[document.body.className]||"";
+ const title=`Décors & plateau — ${jeu}`,sub=`Table ${sz(W,H)} · ${STY[r.style]} · générateur ${o.gen&&G[o.gen]?(o.gen==="libre"?"Libre":G[o.gen].nom):""} · grandes pièces ${(o.siz||[4,8]).join("–")}"${o.col?" · source : ma collection":""}`;
+ window.curHead={title,sub};$("ph").innerHTML=`<h2>${esc(title)}</h2><div>${esc(sub)}</div>`;
+ $("info").innerHTML=h;
+ window.curLines=[...h.matchAll(/<p(?: class="([^"]*)")?>(.*?)<\/p>/g)].map(m=>[m[1]||"",m[2].replace(/<[^>]+>/g,"")]);
+ $("leg").innerHTML=P.map((p,i)=>{const t=T[p.id],nI=ni(p.id);return`<li><span class="sw" style="background:${t[2]}"></span><span><b>${i+1}. ${nI[1]} ${esc(pname(p))}</b> — ${pz(p)}<br><span class="tg">${[...tags(p)].map(k=>TG[k]).join(", ")}</span></span></li>`}).join("");}
+function go(){
+ const o={tab:$("tab").value.split("x").map(Number),sty:+$("sty").value,gen:$("gen").value,siz:$("siz").value.split("-").map(Number),n:+$("n").value||15,org:$("org").checked,fill:$("fill").checked,col:$("src").value==="col"?COL.flatMap(c=>Array.from({length:c.qty},()=>({id:c.id,name:c.nom||ni(c.id)[0],w:c.wcm/2.54,h:c.hcm/2.54}))):null};
+ let r,n=0;do{r=build(o);n++;}while($("auto").checked&&!r.audit.ok&&n<60);
+ window.cur=r;window.curO=o;render(r,n);}
+let COL=[];try{COL=JSON.parse(localStorage.getItem("opr-decors-collection")||"[]")||[];}catch(e){COL=[];}
+const saveCol=()=>{try{localStorage.setItem("opr-decors-collection",JSON.stringify(COL));}catch(e){}};
+function fillTypes(){const sel=$("ctype"),cur=sel.value;sel.innerHTML=Object.keys(T).map(id=>`<option value="${id}">${ni(id)[1]} ${esc(ni(id)[0])}</option>`).join("");if(cur)sel.value=cur;}
+function drawCol(){$("ccount").textContent=COL.reduce((a,c)=>a+c.qty,0);
+ $("clist").innerHTML=COL.map((c,i)=>`<li><span>${ni(c.id)[1]} <b>${esc(c.nom||ni(c.id)[0])}</b> — ${c.wcm}x${c.hcm} cm × ${c.qty}</span><button class="x" data-i="${i}" aria-label="Supprimer">✕</button></li>`).join("");}
+$("cadd").onclick=()=>{const w=+$("cw").value,h=+$("ch").value,q=Math.max(1,Math.min(20,+$("cq").value||1));if(!(w>0&&h>0))return;
+ COL.push({id:$("ctype").value,nom:$("cname").value.trim(),wcm:w,hcm:h,qty:q});saveCol();drawCol();$("cname").value="";};
+$("clist").onclick=e=>{const i=e.target.dataset&&e.target.dataset.i;if(i!==undefined){COL.splice(+i,1);saveCol();drawCol();}};
+$("cclr").onclick=()=>{COL=[];saveCol();drawCol();};
+$("cexp").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(COL,null,1)],{type:"application/json"}));a.download="collection-decors-opr.json";a.click();};
+$("cimpb").onclick=()=>$("cimp").click();
+$("cimp").onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const a=JSON.parse(rd.result);
+ if(Array.isArray(a)){COL=a.filter(c=>c&&T[c.id]&&c.wcm>0&&c.hcm>0).map(c=>({id:c.id,nom:String(c.nom||"").slice(0,40),wcm:+c.wcm,hcm:+c.hcm,qty:Math.max(1,Math.min(20,+c.qty||1))}));saveCol();drawCol();}}catch(x){}};rd.readAsText(f);e.target.value="";};
+$("go").onclick=go;
+$("pdf").onclick=()=>{const t=document.title;document.title="Plateau OPR - "+({aof:"AoF",gf:"GF"}[document.body.className]||"");$("pp").innerHTML=buildSVG();
+ window.onafterprint=()=>{document.title=t;$("pp").innerHTML="";};window.print();};
+$("jeu").onchange=()=>{document.body.className=$("jeu").value;fillTypes();drawCol();if(window.cur)render(window.cur,1);};
+$("svg").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([buildSVG()],{type:"image/svg+xml"}));a.download="plateau-opr.svg";a.click();};
+fillTypes();drawCol();
+go();
+</script>
+</body>
+</html>
