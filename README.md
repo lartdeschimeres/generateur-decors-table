@@ -6,11 +6,11 @@ Outil web, en un seul fichier HTML, qui tire des décors et propose une mise en 
 
 ## Utilisation
 
-1. Télécharger `generateur-decors-opr.html` et l'ouvrir dans un navigateur récent (aucune installation, aucun serveur).
+1. Télécharger `index.html` et l'ouvrir dans un navigateur récent (aucune installation, aucun serveur).
 2. Choisir le jeu, la taille de table, le style de placement, le générateur de décors et la taille des grandes pièces.
 3. Cliquer sur **Générer**, puis exporter en PDF ou en SVG.
 
-Pour le publier en ligne, activer GitHub Pages sur le dépôt (Settings → Pages) en pointant vers la branche principale.
+Pour le publier en ligne, activer GitHub Pages sur le dépôt (Settings → Pages) en pointant vers la branche principale. Le fichier s'appelant `index.html`, l'adresse du site (`https://<utilisateur>.github.io/<dépôt>/`) ouvre directement l'outil.
 
 ## Fonctionnalités
 
@@ -55,7 +55,7 @@ Source : GF / AoF Advanced Rulebook v3.6.0 (placement, générateurs de terrain,
 
 ## ⚠️ À propos des droits
 
-Ce dépôt contient des éléments dérivés de l'**Advanced Rulebook** d'OPR Games (noms et composition des tableaux de décors, recommandations de terrain), un contenu proposé via leur Patreon (donc non gratuit). Cet outil est un projet de fan, non affilié à OPR Games.
+Ce dépôt contient des éléments dérivés de l'**Advanced Rulebook** d'OPR Games (noms et composition des tableaux de décors, recommandations de terrain), un contenu proposé via leur Patreon (donc non gratuit). Cet outil est un projet de fan, non affilié à OPR Games. Avant de rendre ce dépôt public, vérifiez les conditions d'utilisation communautaire d'OPR Games concernant la republication de ce contenu — je n'ai pas pu confirmer si cette diffusion est autorisée par leurs règles.
 
 ## Licence
 
